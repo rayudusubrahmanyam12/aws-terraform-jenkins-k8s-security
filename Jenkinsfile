@@ -11,8 +11,26 @@ pipeline {
 		        sh 'mvn clean verify sonar:sonar -Dsonar.projectKey= -Dsonar.organization=rayudusubrahmanyam12 -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=03284155ab46de9bcfce7f5c1fe8c488e0021d8c'
 			}
     }*/
+  stage ('Check-Git-Secrets') {
+      steps {
+        sh 'rm trufflehog || true'
+        sh 'docker run gesellix/trufflehog --json https://github.com/cehkunal/webapp.git > trufflehog'
+        sh 'cat trufflehog'
+      }
+    }
+  
+      stage('Snyk Test') {
+      steps {
+        echo 'Snyk Testing...'
+        snykSecurity(
+          snykInstallation: 'Snyk@latest',
+          snykTokenId: 'snyktoken'
+          // place other parameters here
+        )
+      }
+    }
 
-  stage('SonarCloud') {
+ /* stage('SonarCloud') {
   environment {
     SCANNER_HOME = tool 'SonarQubeScanner'
     ORGANIZATION = "rayudusubrahmanyam12"
@@ -27,6 +45,7 @@ pipeline {
     }
   }
 }
+*/
 
 
 	/*stage('RunSCAAnalysisUsingSnyk') {
